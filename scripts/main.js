@@ -10,3 +10,11 @@ function Book(title, author, pages, read) {
 function addBookToLibrary() {
     
 }
+
+
+// const form = document.createElement('form');
+// const input = document.createElement('input');
+// form.appendChild(input);
+// const main = document.querySelector('main');
+// main.appendChild(form);
+
