@@ -11,7 +11,7 @@
 
         </header>
         <main>
-            <form>
+            <form name="info">
                 <label for="title">Title of the book</label>
                 <br>
                 <input type="text" name="Title"  id="title">
@@ -22,14 +22,20 @@
                 <br>
                 <label for="pages">No. of pages</label>
                 <br>
-                <input type="text" name="Pages" id="pages">
+                <input type="number" name="Pages" id="pages">
                 <br>
                 <label for="read">Have you read it?</label>
                 <br>
                 <input type="text" name="Read" id="read">
                 <br>
-                <button type="submit">Add new book</button>
+
+                <label for="new">Add new book</label>
+                <br>
+                <input type="button" name="New" id="new" value="Add new book">
+                <br>
+
             </form>
+            <button name="books">current books</button>
 
         </main>
         <footer>
