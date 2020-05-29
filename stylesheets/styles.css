@@ -23,7 +23,7 @@ form {
     /*grid-area:;*/
 }
 
-#card {
+.card {
     background: aliceblue;
     display: flex;
     justify-content: center;
