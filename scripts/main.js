@@ -12,6 +12,21 @@ function render() {
     myLibrary.forEach(book => console.log(book));
 }
 
+function addCard() {
+    const card = document.createElement('div');
+    card.setAttribute('class', 'card');
+    const addButton = document.createElement('button');
+    addButton.value = '+';
+    addButton.textContent = '+';
+    card.appendChild(addButton);
+    main.appendChild(card);
+    addEventListeners();
+}
+
+function addEventListeners() {
+    const plus = document.querySelector('button[value="+"]');
+    plus.addEventListener('click', bringUpForm);
+}
 function addBookToLibrary() {
     const card = this.parentNode.parentNode;
     let title = document.bookInfo.title.value;
@@ -22,10 +37,25 @@ function addBookToLibrary() {
     let tmp = new Book(title, author, pages, read);
     myLibrary.push(tmp);
 
-    card.removeChild(card.firstElementChild)
+    const infoCard = document.createElement('div');
+    infoCard.setAttribute('class', 'infoCard');
+
+    const image = document.createElement('img');
+    image.setAttribute('src', 'assets/images/sample2.png');
+    infoCard.appendChild(image);
+    const details = document.createElement('div');
+    renderDetails(details, tmp);
+    infoCard.appendChild(details);
+    const options = document.createElement('div');
+    infoCard.appendChild(options);
+
+    card.removeChild(card.firstElementChild);
+    card.appendChild(infoCard);
+
+    addCard();
 }
 
-function createInput(form, property) {
+function addInputFields(form, property) {
     const label = document.createElement('label');
     label.setAttribute('for', property);
     label.textContent = property;
@@ -39,14 +69,13 @@ function createInput(form, property) {
     form.appendChild(br);
 }
 
-function bringUpForm(e) {
+function bringUpForm() {
     const card = this.parentNode;
     card.removeChild(card.lastElementChild);
 
     const form = document.createElement('form');
     form.setAttribute('name','bookInfo');
-    bookProperties.forEach(property => createInput(form, property));
-
+    bookProperties.forEach(property => addInputFields(form, property));
     card.appendChild(form);
 
     const save = document.createElement('input');
@@ -54,14 +83,8 @@ function bringUpForm(e) {
     save.value = 'Save';
     form.appendChild(save);
     save.addEventListener('click', addBookToLibrary);
-
-    // submit.addEventListener('click', addBookToLibrary);
-    const display = document.createElement('button');
-    display.textContent = 'Display';
-    display.addEventListener('click', render);
-    card.appendChild(display);
-
 }
 
+const main = document.querySelector('main');
 const plus = document.querySelector('button[value="+"]');
 plus.addEventListener('click', bringUpForm);
