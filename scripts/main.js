@@ -9,6 +9,8 @@ function Book(title, author, pages, read) {
 }
 
 function addCard() {
+    let plus = document.querySelector('button[value="+"]');
+    if(plus) return;
     const card = document.createElement('div');
     card.setAttribute('class', 'card');
     const addButton = document.createElement('button');
