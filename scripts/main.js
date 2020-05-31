@@ -1,11 +1,11 @@
 let myLibrary = [];
-let bookProperties = ['title', 'author', 'pages', 'read'];
+let bookProperties = ['Title', 'Author', 'Pages', 'Read'];
 
-function Book(title, author, pages, read) {
-    this.title = title;
-    this.author = author;
-    this.pages = pages;
-    this.read = read;
+function Book(Title, Author, Pages, Read) {
+    this.Title = Title;
+    this.Author = Author;
+    this.Pages = Pages;
+    this.Read = Read;
 }
 
 function addCard() {
@@ -27,25 +27,25 @@ function addEventListeners() {
 }
 
 function renderDetails(details, tmp) {
-    let title = document.createElement('p');
-    title.setAttribute('value', 'title')
-    title.textContent = tmp.title;
-    details.appendChild(title);
+    let Title = document.createElement('p');
+    Title.setAttribute('value', 'Title')
+    Title.textContent = tmp.Title;
+    details.appendChild(Title);
 
-    let author = document.createElement('p');
-    author.setAttribute('value', 'author')
-    author.textContent = "By " + tmp.author;
-    details.appendChild(author);
+    let Author = document.createElement('p');
+    Author.setAttribute('value', 'Author')
+    Author.textContent = "By " + tmp.Author;
+    details.appendChild(Author);
 
-    let pages = document.createElement('p');
-    pages.setAttribute('value', 'pages')
-    pages.textContent = tmp.pages + " pages";
-    details.appendChild(pages);
+    let Pages = document.createElement('p');
+    Pages.setAttribute('value', 'Pages')
+    Pages.textContent = tmp.Pages + " Pages";
+    details.appendChild(Pages);
 
-    let read = document.createElement('p');
-    read.setAttribute('value', 'read')
-    read.textContent = tmp.read;
-    details.appendChild(read);
+    let Read = document.createElement('p');
+    Read.setAttribute('value', 'Read')
+    Read.textContent = tmp.Read;
+    details.appendChild(Read);
 }
 
 function  addOptions(options, tmp) {
@@ -62,17 +62,17 @@ function  addOptions(options, tmp) {
     del.addEventListener('click', deleteCard);
     options.appendChild(del);
 
-    let read = document.createElement('button');
-    read.setAttribute('value', 'read');
-    read.textContent = 'Read';
-    read.addEventListener('click', readStatus);
-    options.appendChild(read);
+    let Read = document.createElement('button');
+    Read.setAttribute('value', 'Read');
+    Read.textContent = 'Read';
+    Read.addEventListener('click', ReadStatus);
+    options.appendChild(Read);
 }
 
-function readStatus() {
+function ReadStatus() {
     let currentCard = this.parentNode.parentNode;
-    let read = currentCard.querySelector(`p[value="read"]`);
-    read.textContent = 'yes';
+    let Read = currentCard.querySelector(`p[value="Read"]`);
+    Read.textContent = 'yes';
 }
 
 function deleteCard() {
@@ -82,12 +82,15 @@ function deleteCard() {
 
 function addBookToLibrary() {
     const card = this.parentNode.parentNode;
-    let title = document.bookInfo.title.value;
-    let author = document.bookInfo.author.value;
-    let pages = document.bookInfo.pages.value;
-    let read = document.bookInfo.read.value;
+    let Title = document.bookInfo.Title.value;
+    let Author = document.bookInfo.Author.value;
+    let Pages = document.bookInfo.Pages.value;
 
-    let tmp = new Book(title, author, pages, read);
+    let readButtons = [...document.querySelectorAll('input[name="Read"]')];
+    let selectedButton = readButtons.filter( readButton => readButton.checked)[0];
+    let read = selectedButton.value;
+
+    let tmp = new Book(Title, Author, Pages, Read);
     myLibrary.push(tmp);
 
     const infoCard = document.createElement('div');
@@ -112,19 +115,75 @@ function addBookToLibrary() {
     addCard();
 }
 
+function  radioInputSection(property) {
+    // Create a section for the property
+    const section = document.createElement('section');
+    section.setAttribute('id', property);
+
+    // span for the choice heading
+    const span = document.createElement('span');
+    span.textContent = property;
+    section.appendChild(span);
+    let br = document.createElement('br');
+    section.appendChild(br);
+
+    // Radio button for yes
+    const yesInput = document.createElement('input');
+    yesInput.type = 'radio';
+    yesInput.name = 'Read';
+    yesInput.id = 'yes';
+    yesInput.value = 'yes';
+    section.appendChild(yesInput);
+    const yesLabel = document.createElement('label');
+    yesLabel.textContent = 'Yes'
+    yesLabel.for = 'yes';
+    section.appendChild(yesLabel)
+
+    // Radio button for no
+    const noInput = document.createElement('input');
+    noInput.type = 'radio';
+    noInput.name = 'Read';
+    noInput.id = 'no';
+    noInput.value = 'no';
+    noInput.checked= "checked";
+    section.appendChild(noInput);
+    const noLabel = document.createElement('label');
+    noLabel.textContent = 'No'
+    noLabel.for = 'no';
+    section.appendChild(noLabel);
+    return section;
+}
+
 function addInputFields(form, book, property) {
+    if (property === 'Read') {
+        let section = radioInputSection(property);
+        form.appendChild(section);
+        return;
+    }
+
+    // Create a section for the property
+    const section = document.createElement('section');
+    section.setAttribute('id', property);
+
+    // Add label for input
     const label = document.createElement('label');
     label.setAttribute('for', property);
     label.textContent = property;
-    form.appendChild(label);
+    section.appendChild(label);
+    let br = document.createElement('br');
+    section.appendChild(br);
+
+    // Add input field
     const input = document.createElement('input');
     input.setAttribute('id', property);
-    if (property === 'pages')
+    if (property === 'Pages')
         input.setAttribute('type', 'number');
     input.value = book[property];
-    form.appendChild(input);
-    let br = document.createElement('br')
-    form.appendChild(br);
+    section.appendChild(input);
+    section.appendChild(br);
+
+    // Add section to form
+    form.appendChild(section);
 }
 
 function bringUpForm() {
@@ -135,9 +194,9 @@ function bringUpForm() {
         card = this.parentNode.parentNode.parentNode;
         let infoCard = this.parentNode.parentNode;
         let details = infoCard.querySelector('div[value="details"]');
-        let title = details.querySelector('p[value="title"]');
-        // retrieve book with title
-        currentBook = myLibrary.filter(book => book.title === title.textContent)[0];
+        let Title = details.querySelector('p[value="Title"]');
+        // retrieve book with Title
+        currentBook = myLibrary.filter(book => book.Title === Title.textContent)[0];
     } else {
         card = this.parentNode;
         currentBook = new Book('', '', '', '');
