@@ -46,6 +46,21 @@ function renderDetails(details, tmp) {
     details.appendChild(read);
 }
 
+function  addOptions(options, tmp) {
+    let edit = document.createElement('button');
+    edit.textContent = 'Edit';
+    // edit.addEventListener('click', bringUpForm(tmp));
+    options.appendChild(edit);
+
+    let del = document.createElement('button');
+    del.textContent = 'Delete';
+    del.addEventListener('click', deleteCard);
+    options.appendChild(del);
+
+    let read = document.createElement('button');
+    read.textContent = 'Read';
+    options.appendChild(read);
+}
 
 
 function addBookToLibrary() {
