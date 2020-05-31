@@ -8,10 +8,6 @@ function Book(title, author, pages, read) {
     this.read = read;
 }
 
-function render() {
-    myLibrary.forEach(book => console.log(book));
-}
-
 function addCard() {
     const card = document.createElement('div');
     card.setAttribute('class', 'card');
@@ -51,17 +47,21 @@ function renderDetails(details, tmp) {
 }
 
 function  addOptions(options, tmp) {
+
     let edit = document.createElement('button');
+    edit.setAttribute('value', 'edit')
     edit.textContent = 'Edit';
-    // edit.addEventListener('click', editBook);
+    edit.addEventListener('click', bringUpForm);
     options.appendChild(edit);
 
     let del = document.createElement('button');
+    del.setAttribute('value', 'delete')
     del.textContent = 'Delete';
     del.addEventListener('click', deleteCard);
     options.appendChild(del);
 
     let read = document.createElement('button');
+    read.setAttribute('value', 'read');
     read.textContent = 'Read';
     read.addEventListener('click', readStatus);
     options.appendChild(read);
@@ -71,13 +71,11 @@ function readStatus() {
     let currentCard = this.parentNode.parentNode;
     let read = currentCard.querySelector(`p[value="read"]`);
     read.textContent = 'yes';
-    console.log(read);
 }
 
 function deleteCard() {
     let card = this.parentNode.parentNode.parentNode;
     main.removeChild(card);
-    // console.log(main.child);
 }
 
 function addBookToLibrary() {
@@ -98,6 +96,7 @@ function addBookToLibrary() {
     infoCard.appendChild(image);
 
     const details = document.createElement('div');
+    details.setAttribute('value', 'details');
     renderDetails(details, tmp);
     infoCard.appendChild(details);
 
@@ -111,7 +110,7 @@ function addBookToLibrary() {
     addCard();
 }
 
-function addInputFields(form, property) {
+function addInputFields(form, book, property) {
     const label = document.createElement('label');
     label.setAttribute('for', property);
     label.textContent = property;
@@ -120,18 +119,33 @@ function addInputFields(form, property) {
     input.setAttribute('id', property);
     if (property === 'pages')
         input.setAttribute('type', 'number');
+    input.value = book[property];
     form.appendChild(input);
     let br = document.createElement('br')
     form.appendChild(br);
 }
 
 function bringUpForm() {
-    const card = this.parentNode;
+    let caller = this.value;
+    let card = '';
+    let currentBook = ''
+    if(caller === 'edit') {
+        card = this.parentNode.parentNode.parentNode;
+        let infoCard = this.parentNode.parentNode;
+        let details = infoCard.querySelector('div[value="details"]');
+        let title = details.querySelector('p[value="title"]');
+        // retrieve book with title
+        currentBook = myLibrary.filter(book => book.title === title.textContent)[0];
+    } else {
+        card = this.parentNode;
+        currentBook = new Book('', '', '', '');
+    }
+
     card.removeChild(card.lastElementChild);
 
     const form = document.createElement('form');
     form.setAttribute('name','bookInfo');
-    bookProperties.forEach(property => addInputFields(form, property));
+    bookProperties.forEach(property => addInputFields(form, currentBook ,property));
     card.appendChild(form);
 
     const save = document.createElement('input');
