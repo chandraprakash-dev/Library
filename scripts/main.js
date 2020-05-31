@@ -63,6 +63,12 @@ function  addOptions(options, tmp) {
 }
 
 
+function deleteCard() {
+    let card = this.parentNode.parentNode.parentNode;
+    main.removeChild(card);
+    // console.log(main.child);
+}
+
 function addBookToLibrary() {
     const card = this.parentNode.parentNode;
     let title = document.bookInfo.title.value;
