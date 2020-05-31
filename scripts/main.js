@@ -27,6 +27,27 @@ function addEventListeners() {
     const plus = document.querySelector('button[value="+"]');
     plus.addEventListener('click', bringUpForm);
 }
+
+function renderDetails(details, tmp) {
+    let title = document.createElement('p');
+    title.textContent = tmp.title;
+    details.appendChild(title);
+
+    let author = document.createElement('p');
+    author.textContent = "By " + tmp.author;
+    details.appendChild(author);
+
+    let pages = document.createElement('p');
+    pages.textContent = tmp.pages + " pages";
+    details.appendChild(pages);
+
+    let read = document.createElement('p');
+    read.textContent = tmp.read;
+    details.appendChild(read);
+}
+
+
+
 function addBookToLibrary() {
     const card = this.parentNode.parentNode;
     let title = document.bookInfo.title.value;
@@ -43,10 +64,13 @@ function addBookToLibrary() {
     const image = document.createElement('img');
     image.setAttribute('src', 'assets/images/sample2.png');
     infoCard.appendChild(image);
+
     const details = document.createElement('div');
     renderDetails(details, tmp);
     infoCard.appendChild(details);
+
     const options = document.createElement('div');
+    addOptions(options, tmp);
     infoCard.appendChild(options);
 
     card.removeChild(card.firstElementChild);
@@ -55,7 +79,7 @@ function addBookToLibrary() {
     addCard();
 }
 
-function addInputFields(form, property) {
+function addInputFields(form, book, property) {
     const label = document.createElement('label');
     label.setAttribute('for', property);
     label.textContent = property;
@@ -64,18 +88,20 @@ function addInputFields(form, property) {
     input.setAttribute('id', property);
     if (property === 'pages')
         input.setAttribute('type', 'number');
+    // input.textContent = myLibrary[];
+    input.textContent = book[property];
     form.appendChild(input);
     let br = document.createElement('br')
     form.appendChild(br);
 }
 
-function bringUpForm() {
+function bringUpForm(book= new Book('', '', '', '')) {
     const card = this.parentNode;
     card.removeChild(card.lastElementChild);
 
     const form = document.createElement('form');
     form.setAttribute('name','bookInfo');
-    bookProperties.forEach(property => addInputFields(form, property));
+    bookProperties.forEach(property => addInputFields(form, book, property));
     card.appendChild(form);
 
     const save = document.createElement('input');
