@@ -8,22 +8,41 @@ function Book(Title, Author, Pages, Read) {
     this.Read = Read;
 }
 
-function addCard() {
-    let plus = document.querySelector('button[value="+"]');
-    if(plus) return;
-    const card = document.createElement('div');
-    card.setAttribute('class', 'card');
-    const addButton = document.createElement('button');
-    addButton.value = '+';
-    addButton.textContent = '+';
-    card.appendChild(addButton);
-    main.appendChild(card);
-    addEventListeners();
+function ReadStatus() {
+    let currentCard = this.parentNode.parentNode;
+    let Read = currentCard.querySelector(`p[value="Read"]`);
+    let read = Read.textContent;
+    if(read.includes('Yes')) {
+        read = "No";
+    } else {
+        read = "Yes";
+    }
+    Read.textContent = `Read: ${read}`;
 }
 
-function addEventListeners() {
-    const plus = document.querySelector('button[value="+"]');
-    plus.addEventListener('click', bringUpForm);
+function deleteCard() {
+    let card = this.parentNode.parentNode.parentNode;
+    main.removeChild(card);
+}
+
+function  addOptions(options) {
+    let edit = document.createElement('button');
+    edit.setAttribute('value', 'edit')
+    edit.textContent = 'Edit';
+    edit.addEventListener('click', bringUpForm);
+    options.appendChild(edit);
+
+    let del = document.createElement('button');
+    del.setAttribute('value', 'delete')
+    del.textContent = 'Delete';
+    del.addEventListener('click', deleteCard);
+    options.appendChild(del);
+
+    let read = document.createElement('button');
+    read.setAttribute('value', 'Read');
+    read.textContent = 'Read';
+    read.addEventListener('click', ReadStatus);
+    options.appendChild(read);
 }
 
 function renderDetails(details, tmp) {
@@ -44,55 +63,24 @@ function renderDetails(details, tmp) {
 
     let Read = document.createElement('p');
     Read.setAttribute('value', 'Read')
-    Read.textContent = tmp.Read;
+    Read.textContent = 'Read: ' + tmp.Read.charAt(0).toUpperCase() + tmp.Read.substr(1);
     details.appendChild(Read);
 }
 
-function  addOptions(options, tmp) {
-
-    let edit = document.createElement('button');
-    edit.setAttribute('value', 'edit')
-    edit.textContent = 'Edit';
-    edit.addEventListener('click', bringUpForm);
-    options.appendChild(edit);
-
-    let del = document.createElement('button');
-    del.setAttribute('value', 'delete')
-    del.textContent = 'Delete';
-    del.addEventListener('click', deleteCard);
-    options.appendChild(del);
-
-    let Read = document.createElement('button');
-    Read.setAttribute('value', 'Read');
-    Read.textContent = 'Read';
-    Read.addEventListener('click', ReadStatus);
-    options.appendChild(Read);
+function addNewCard() {
+    let plus = document.querySelector('button[value="+"]');
+    if(plus) return;
+    const card = document.createElement('div');
+    card.setAttribute('class', 'card');
+    const addButton = document.createElement('button');
+    addButton.value = '+';
+    addButton.textContent = '+';
+    card.appendChild(addButton);
+    main.appendChild(card);
+    addEventListeners();
 }
 
-function ReadStatus() {
-    let currentCard = this.parentNode.parentNode;
-    let Read = currentCard.querySelector(`p[value="Read"]`);
-    Read.textContent = 'yes';
-}
-
-function deleteCard() {
-    let card = this.parentNode.parentNode.parentNode;
-    main.removeChild(card);
-}
-
-function addBookToLibrary() {
-    const card = this.parentNode.parentNode;
-    let Title = document.bookInfo.Title.value;
-    let Author = document.bookInfo.Author.value;
-    let Pages = document.bookInfo.Pages.value;
-
-    let readButtons = [...document.querySelectorAll('input[name="Read"]')];
-    let selectedButton = readButtons.filter( readButton => readButton.checked)[0];
-    let read = selectedButton.value;
-
-    let tmp = new Book(Title, Author, Pages, Read);
-    myLibrary.push(tmp);
-
+function updateCard(card, tmp) {
     const infoCard = document.createElement('div');
     infoCard.setAttribute('class', 'infoCard');
 
@@ -106,16 +94,33 @@ function addBookToLibrary() {
     infoCard.appendChild(details);
 
     const options = document.createElement('div');
-    addOptions(options, tmp);
+    addOptions(options);
     infoCard.appendChild(options);
 
     card.removeChild(card.firstElementChild);
     card.appendChild(infoCard);
-
-    addCard();
 }
 
-function  radioInputSection(property) {
+function addBookToLibrary() {
+    const card = this.parentNode.parentNode;
+    let Title = document.bookInfo.Title.value;
+    let Author = document.bookInfo.Author.value;
+    let Pages = document.bookInfo.Pages.value;
+
+    let readButtons = [...document.querySelectorAll('input[name="Read"]')];
+    let selectedButton = readButtons.filter( readButton => readButton.checked)[0];
+    let Read = selectedButton.value;
+
+    let tmp = new Book(Title, Author, Pages, Read);
+    myLibrary.push(tmp);
+
+    updateCard(card, tmp);
+    addNewCard();
+}
+
+function  addRadioInputSection(book, property) {
+    let read = book[property];
+
     // Create a section for the property
     const section = document.createElement('section');
     section.setAttribute('id', property);
@@ -133,6 +138,7 @@ function  radioInputSection(property) {
     yesInput.name = 'Read';
     yesInput.id = 'yes';
     yesInput.value = 'yes';
+    if(read) yesInput.checked= "checked";
     section.appendChild(yesInput);
     const yesLabel = document.createElement('label');
     yesLabel.textContent = 'Yes'
@@ -145,7 +151,7 @@ function  radioInputSection(property) {
     noInput.name = 'Read';
     noInput.id = 'no';
     noInput.value = 'no';
-    noInput.checked= "checked";
+    if(!read) noInput.checked= "checked";
     section.appendChild(noInput);
     const noLabel = document.createElement('label');
     noLabel.textContent = 'No'
@@ -156,7 +162,7 @@ function  radioInputSection(property) {
 
 function addInputFields(form, book, property) {
     if (property === 'Read') {
-        let section = radioInputSection(property);
+        let section = addRadioInputSection(book, property);
         form.appendChild(section);
         return;
     }
@@ -186,9 +192,22 @@ function addInputFields(form, book, property) {
     form.appendChild(section);
 }
 
+function addForm(card, currentBook) {
+    const form = document.createElement('form');
+    form.setAttribute('name','bookInfo');
+    bookProperties.forEach(property => addInputFields(form, currentBook ,property));
+    card.appendChild(form);
+
+    const save = document.createElement('input');
+    save.type = 'button';
+    save.value = 'Save';
+    form.appendChild(save);
+    save.addEventListener('click', addBookToLibrary);
+}
+
 function bringUpForm() {
     let caller = this.value;
-    let card = '';
+    let card;
     let currentBook = ''
     if(caller === 'edit') {
         card = this.parentNode.parentNode.parentNode;
@@ -203,19 +222,13 @@ function bringUpForm() {
     }
 
     card.removeChild(card.lastElementChild);
+    addForm(card, currentBook);
+}
 
-    const form = document.createElement('form');
-    form.setAttribute('name','bookInfo');
-    bookProperties.forEach(property => addInputFields(form, currentBook ,property));
-    card.appendChild(form);
-
-    const save = document.createElement('input');
-    save.type = 'button';
-    save.value = 'Save';
-    form.appendChild(save);
-    save.addEventListener('click', addBookToLibrary);
+function addEventListeners() {
+    const plus = document.querySelector('button[value="+"]');
+    plus.addEventListener('click', bringUpForm);
 }
 
 const main = document.querySelector('main');
-const plus = document.querySelector('button[value="+"]');
-plus.addEventListener('click', bringUpForm);
+addEventListeners();
