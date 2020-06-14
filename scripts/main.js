@@ -111,8 +111,7 @@ function updateCard(card, book) {
     card.appendChild(infoCard);
 }
 
-function addBookToLibrary() {
-    const card = this.parentNode.parentNode;
+function getFormDetails() {
     let Title = document.bookInfo.Title.value;
     let Author = document.bookInfo.Author.value;
     let Pages = document.bookInfo.Pages.value;
@@ -121,7 +120,27 @@ function addBookToLibrary() {
     let selectedButton = readButtons.filter( readButton => readButton.checked)[0];
     let Read = selectedButton.value;
 
-    let book = new Book(Title, Author, Pages, Read);
+    return {Title, Author, Pages, Read};
+}
+
+function editBookInLibrary(book) {
+    const card = this.parentNode.parentNode;
+    let details = getFormDetails();
+
+    book.Title = details.Title;
+    book.Author = details.Author;
+    book.Pages = details.Pages;
+    book.Read = details.Read;
+    console.log(book, details);
+
+    updateCard(card, book);
+}
+
+function addBookToLibrary() {
+    const card = this.parentNode.parentNode;
+    let details = getFormDetails();
+
+    let book = new Book(details.Title, details.Author, details.Pages, details.Read);
     myLibrary.push(book);
 
     updateCard(card, book);
@@ -202,37 +221,48 @@ function addInputFields(form, book, property) {
     form.appendChild(section);
 }
 
-function addForm(card, currentBook) {
+function addForm(card, book) {
     const form = document.createElement('form');
     form.setAttribute('name','bookInfo');
-    bookProperties.forEach(property => addInputFields(form, currentBook ,property));
+    bookProperties.forEach(property => addInputFields(form, book ,property));
     card.appendChild(form);
 
     const save = document.createElement('input');
     save.type = 'button';
     save.value = 'Save';
     form.appendChild(save);
-    save.addEventListener('click', addBookToLibrary);
+
+    if(!retrieveBookFromLibrary(book.Title).length) {
+        console.log(book);
+        save.addEventListener('click', addBookToLibrary);
+    } else {
+        save.addEventListener('click', function () {
+            editBookInLibrary(book);
+        });
+    }
+}
+
+function retrieveBookFromLibrary(Title) {
+    // retrieve book with Title
+    return myLibrary.filter(book => book.Title === Title);
 }
 
 function bringUpForm() {
     let caller = this.value;
     let card;
-    let currentBook = ''
+    let book;
     if(caller === 'edit') {
         card = this.parentNode.parentNode.parentNode;
-        let infoCard = this.parentNode.parentNode;
+        let infoCard = card.firstElementChild;
         let details = infoCard.querySelector('div[value="details"]');
-        let Title = details.querySelector('p[value="Title"]');
-        // retrieve book with Title
-        currentBook = myLibrary.filter(book => book.Title === Title.textContent)[0];
+        let Title = details.querySelector('p[value="Title"]').textContent;
+        book = retrieveBookFromLibrary(Title)[0];
     } else {
         card = this.parentNode;
-        currentBook = new Book('', '', '', '');
+        book = new Book('', '', '', '');
     }
-
     card.removeChild(card.lastElementChild);
-    addForm(card, currentBook);
+    addForm(card, book);
 }
 
 function addEventListeners() {
