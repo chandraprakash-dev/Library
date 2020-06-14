@@ -1,6 +1,7 @@
+////////////////////////////////////////////////////////////////////////////////////////////////
 let myLibrary = [];
 let bookProperties = ['Title', 'Author', 'Pages', 'Read'];
-
+////////////////////////////////////////////////////////////////////////////////////////////////
 function Book(Title, Author, Pages, Read) {
     this.Title = Title;
     this.Author = Author;
@@ -22,6 +23,14 @@ function ReadStatus() {
 
 function deleteCard() {
     let card = this.parentNode.parentNode.parentNode;
+    let infoCard = this.parentNode.parentNode;
+    let details = infoCard.querySelector('div[value="details"]');
+    let Title = details.querySelector('p[value="Title"]');
+    // retrieve book with Title
+    let currentBook = myLibrary.filter(book => book.Title === Title.textContent)[0];
+    let index = myLibrary.findIndex(book => book.Title === Title.textContent);
+    console.log(myLibrary, currentBook, index);
+    myLibrary.splice(index, 1);
     main.removeChild(card);
 }
 
@@ -45,25 +54,26 @@ function  addOptions(options) {
     options.appendChild(read);
 }
 
-function renderDetails(details, tmp) {
+
+function renderDetails(details, book) {
     let Title = document.createElement('p');
     Title.setAttribute('value', 'Title')
-    Title.textContent = tmp.Title;
+    Title.textContent = book.Title;
     details.appendChild(Title);
 
     let Author = document.createElement('p');
     Author.setAttribute('value', 'Author')
-    Author.textContent = "By " + tmp.Author;
+    Author.textContent = "By " + book.Author;
     details.appendChild(Author);
 
     let Pages = document.createElement('p');
     Pages.setAttribute('value', 'Pages')
-    Pages.textContent = tmp.Pages + " Pages";
+    Pages.textContent = book.Pages + " Pages";
     details.appendChild(Pages);
 
     let Read = document.createElement('p');
     Read.setAttribute('value', 'Read')
-    Read.textContent = 'Read: ' + tmp.Read.charAt(0).toUpperCase() + tmp.Read.substr(1);
+    Read.textContent = 'Read: ' + book.Read.charAt(0).toUpperCase() + book.Read.substr(1);
     details.appendChild(Read);
 }
 
@@ -80,7 +90,7 @@ function addNewCard() {
     addEventListeners();
 }
 
-function updateCard(card, tmp) {
+function updateCard(card, book) {
     const infoCard = document.createElement('div');
     infoCard.setAttribute('class', 'infoCard');
 
@@ -90,7 +100,7 @@ function updateCard(card, tmp) {
 
     const details = document.createElement('div');
     details.setAttribute('value', 'details');
-    renderDetails(details, tmp);
+    renderDetails(details, book);
     infoCard.appendChild(details);
 
     const options = document.createElement('div');
@@ -111,10 +121,10 @@ function addBookToLibrary() {
     let selectedButton = readButtons.filter( readButton => readButton.checked)[0];
     let Read = selectedButton.value;
 
-    let tmp = new Book(Title, Author, Pages, Read);
-    myLibrary.push(tmp);
+    let book = new Book(Title, Author, Pages, Read);
+    myLibrary.push(book);
 
-    updateCard(card, tmp);
+    updateCard(card, book);
     addNewCard();
 }
 
@@ -230,5 +240,6 @@ function addEventListeners() {
     plus.addEventListener('click', bringUpForm);
 }
 
+// main starts here
 const main = document.querySelector('main');
 addEventListeners();
