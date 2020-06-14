@@ -10,26 +10,29 @@ function Book(Title, Author, Pages, Read) {
 }
 
 function ReadStatus() {
-    let currentCard = this.parentNode.parentNode;
-    let Read = currentCard.querySelector(`p[value="Read"]`);
+    let card = this.parentNode.parentNode;
+    let Title = card.querySelector('p[value="Title"]').textContent;
+    let book = retrieveBookFromLibrary(Title)[0];
+    console.log(book);
+    let Read = card.querySelector(`p[value="Read"]`);
     let read = Read.textContent;
     if(read.includes('Yes')) {
         read = "No";
     } else {
         read = "Yes";
     }
+    book.Read = read;
     Read.textContent = `Read: ${read}`;
+    console.log(myLibrary);
 }
 
-function deleteCard() {
+function deleteBook() {
     let card = this.parentNode.parentNode.parentNode;
-    let infoCard = this.parentNode.parentNode;
-    let details = infoCard.querySelector('div[value="details"]');
-    let Title = details.querySelector('p[value="Title"]');
+    let Title = card.querySelector('p[value="Title"]').textContent;
     // retrieve book with Title
-    let currentBook = myLibrary.filter(book => book.Title === Title.textContent)[0];
-    let index = myLibrary.findIndex(book => book.Title === Title.textContent);
-    console.log(myLibrary, currentBook, index);
+    let book = retrieveBookFromLibrary(Title);
+    let index = myLibrary.findIndex(book => book.Title === Title);
+    console.log(myLibrary, book, index);
     myLibrary.splice(index, 1);
     main.removeChild(card);
 }
@@ -44,7 +47,7 @@ function  addOptions(options) {
     let del = document.createElement('button');
     del.setAttribute('value', 'delete')
     del.textContent = 'Delete';
-    del.addEventListener('click', deleteCard);
+    del.addEventListener('click', deleteBook);
     options.appendChild(del);
 
     let read = document.createElement('button');
@@ -123,8 +126,7 @@ function getFormDetails() {
     return {Title, Author, Pages, Read};
 }
 
-function editBookInLibrary(book) {
-    const card = this.parentNode.parentNode;
+function editBookInLibrary(card, book) {
     let details = getFormDetails();
 
     book.Title = details.Title;
@@ -147,7 +149,7 @@ function addBookToLibrary() {
     addNewCard();
 }
 
-function  addRadioInputSection(book, property) {
+function addRadioInputSection(book, property) {
     let read = book[property];
 
     // Create a section for the property
@@ -237,7 +239,7 @@ function addForm(card, book) {
         save.addEventListener('click', addBookToLibrary);
     } else {
         save.addEventListener('click', function () {
-            editBookInLibrary(book);
+            editBookInLibrary(card, book);
         });
     }
 }
@@ -253,9 +255,7 @@ function bringUpForm() {
     let book;
     if(caller === 'edit') {
         card = this.parentNode.parentNode.parentNode;
-        let infoCard = card.firstElementChild;
-        let details = infoCard.querySelector('div[value="details"]');
-        let Title = details.querySelector('p[value="Title"]').textContent;
+        let Title = card.querySelector('p[value="Title"]').textContent;
         book = retrieveBookFromLibrary(Title)[0];
     } else {
         card = this.parentNode;
