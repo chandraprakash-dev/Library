@@ -2,11 +2,13 @@
 let myLibrary = [];
 let bookProperties = ['Title', 'Author', 'Pages', 'Read'];
 ////////////////////////////////////////////////////////////////////////////////////////////////
-function Book(Title, Author, Pages, Read) {
-    this.Title = Title;
-    this.Author = Author;
-    this.Pages = Pages;
-    this.Read = Read;
+class Book {
+    constructor(Title, Author, Pages, Read) {
+        this.Title = Title;
+        this.Author = Author;
+        this.Pages = Pages;
+        this.Read = Read;
+    }
 }
 
 function ReadStatus() {
