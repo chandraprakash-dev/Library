@@ -141,7 +141,7 @@ function editBookInLibrary(card, book) {
 }
 
 function addBookToLibrary() {
-    const card = this.parentNode.parentNode;
+    const card = this.parentNode;
     let details = getFormDetails();
 
     let book = new Book(details.Title, details.Author, details.Pages, details.Read);
@@ -215,6 +215,15 @@ function addInputFields(form, book, property) {
     // Add input field
     const input = document.createElement('input');
     input.setAttribute('id', property);
+    input.required = true;
+    input.addEventListener('input', () => {
+        console.log(input.checkValidity());
+        if(!input.checkValidity()) {
+            input.setCustomValidity('This field is required');
+        } else {
+            input.setCustomValidity('');
+        }
+    })
     if (property === 'Pages')
         input.setAttribute('type', 'number');
     input.value = book[property];
@@ -231,16 +240,16 @@ function addForm(card, book) {
     bookProperties.forEach(property => addInputFields(form, book ,property));
     card.appendChild(form);
 
-    const save = document.createElement('input');
-    save.type = 'button';
-    save.value = 'Save';
+    const save = document.createElement('button');
+    save.type = 'submit';
+    save.textContent = 'Save';
     form.appendChild(save);
 
     if(!retrieveBookFromLibrary(book.Title).length) {
         console.log(book);
-        save.addEventListener('click', addBookToLibrary);
+        form.addEventListener('submit', addBookToLibrary);
     } else {
-        save.addEventListener('click', function () {
+        form.addEventListener('submit', function () {
             editBookInLibrary(card, book);
         });
     }
